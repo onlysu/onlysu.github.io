@@ -1,0 +1,436 @@
+﻿<!DOCTYPE html>
+<html lang='zh-CN'>
+<head>
+  
+  <meta charset='utf-8'>
+  <meta name='viewport' content='width=device-width, initial-scale=1'>
+  <link rel='stylesheet' type='text/css' href='bootstrap.css'>
+  <script src='jquery.js'></script>
+  <script src='popper.js'></script>
+  <script src='bootstrap.js'></script>
+  
+  <!--<link rel='stylesheet' href='https://cdn.staticfile.org/twitter-bootstrap/4.3.1/css/bootstrap.min.css'>
+  <script src='https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js'></script>
+  <script src='https://cdn.staticfile.org/popper.js/1.15.0/umd/popper.min.js'></script>
+  <script src='https://cdn.staticfile.org/twitter-bootstrap/4.3.1/js/bootstrap.min.js'></script>-->
+  <title>天气墨水屏配置</title>
+</head>	
+<body>
+	
+	<div class='container'>
+	
+		<h2>WIFI配置&nbsp;<small style='font-size:1rem;'><span id='span_staNameIp'>获取中...<!--返回STA名称和ip--></span></small></h2>
+		
+		<form id='form_wifi' target='iframe_wifi'>
+			<div class='form-group'>
+				<label for='ssid'>WIFI名称:</label>
+				<input type='text' class='form-control' name='ssid' placeholder='请输入'>
+			</div>
+			<div class='form-group'>
+				<label for='password'>WIFI密码:</label>
+				<input type='text' class='form-control' name='password' placeholder='请输入'>
+			</div>
+			
+			<button type='submit' class='btn btn-primary' onclick='tjxx_wifi()'>保存并连接</button>
+			<span id='span_wifiReturnFormInfo'>
+			<!-- 按下保存按钮后服务器返回的消息提示 -->
+			</span>
+			
+		</form>
+		<iframe id='iframe_wifi' name='iframe_wifi' style='display:none;'></iframe>
+		
+		<br>
+	    <hr/>
+		
+		<h2>天气配置 <small style='font-size:1rem;'><span id='span_city'>获取中...<!--返回请求的城市--></span></small></h2>
+		
+		<form id='form_weather' target='iframe_weather'>
+			<div class='form-group'>
+				<label for='WeatherKey'>天气Key:</label>
+				<input type='text' class='form-control' name='WeatherKey' placeholder='请输入'>
+			</div>
+			<div class='form-group'>
+				<label for='city'>城&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;市:</label>
+				<input type='text' class='form-control' name='city' placeholder='输入中文或拼音'>
+			</div>
+			<button type='submit' class='btn btn-primary' onclick='tjxx_weather()'>保存</button>
+			<span id='span_weatherReturnFormInfo'>
+			<!-- 按下保存按钮后服务器返回的消息提示 -->
+			</span>
+		</form>
+		
+		<iframe id='iframe_weather' name='iframe_weather' style='display:none;'></iframe>
+		
+		<br><br>
+		
+		<!-- <a href='/Updata'><button type='button' class='btn btn-success' style='margin:0.5% 0% 0% 0%'>固件更新</button></a> -->
+		<!-- 按钮：用于打开固件更新模态框 -->
+		<button type="button" class="btn btn-success" data-toggle="modal" data-target="#Modal_updata" style='margin:0.5% 0% 0% 0.5%' onclick='get_updateAddress()'>
+			固件更新
+		</button>
+		<!-- 按钮：用于打开上传文件模态框 -->
+		<button type="button" class="btn btn-success" data-toggle="modal" data-target="#Modal_fileUpdata" style='margin:0.5% 0% 0% 0.5%'>
+			上传文件
+		</button>
+		<!-- 按钮：用于打开更多设置模态框 get_batDisplayType()--> 
+		<button type="button" class="btn btn-success" data-toggle="modal" data-target="#Modal_moreSet" style='margin:0.5% 0% 0% 0.5%' onclick='get_nightUpdata()'> 
+			更多设置
+		</button>
+		<!-- 按钮：用于打开系统信息模态框 -->
+		<button type="button" class="btn btn-success" data-toggle="modal" data-target="#Modal_info" style='margin:0.5% 2% 0% 0.5%' onclick='get_info()'>
+			关于
+		</button>
+		<a href='/RESET'><button type='button' class='btn btn-warning' style='margin:0.5% 0% 0% 0.5%'>重启</button></a>
+		   		
+		  <!-- 固件更新模态框 -->
+		  <div class="modal fade" id="Modal_updata">
+			<div class="modal-dialog">
+			  <div class="modal-content">
+		   
+				<!-- 模态框头部 -->
+				<div class="modal-header">
+				  <h4 class="modal-title">Web更新固件模式</h4>
+				  <button type="button" class="close" data-dismiss="modal">&times;</button>
+				</div>
+		   
+				<!-- 模态框主体 -->
+				<div class="modal-body">
+					<span id='span_updataAddress'>
+					获取中...
+					</span>
+				</div>
+				
+				<!-- 模态框底部 -->
+				<div class="modal-footer">
+				  <button type="button" class="btn btn-danger" data-dismiss="modal">关闭</button>
+				</div>
+		   
+			  </div>
+			</div>
+		  </div>
+				
+		  <!-- 上传文件模态框 -->
+		  <div class="modal fade" id="Modal_fileUpdata">
+			<div class="modal-dialog">
+			  <div class="modal-content">
+		   
+				<!-- 模态框头部 -->
+				<div class="modal-header">
+				  <h4 class="modal-title">上传到SPIFFS</h4>
+				  <button type="button" class="close" data-dismiss="modal">&times;</button>
+				</div>
+		   
+				<!-- 模态框主体 -->
+				<div class="modal-body">
+					<form method='POST' action='/FileUpdata' class="btn" enctype='multipart/form-data'> <!-- 上传文件选框 -->
+					<input type='file' name='data'>
+				</div>
+				
+				<!-- 模态框底部 -->
+				<div class="modal-footer">
+					<input class='btn btn-warning' type='submit' value='上传'>
+					</form>
+				    <button type="button" class="btn btn-danger" data-dismiss="modal">关闭</button>
+				</div>
+				
+				
+			  </div>
+			</div>
+		  </div>
+		   
+		  <!-- 更多设置模态框 -->
+		  <div class="modal fade" id="Modal_moreSet">
+			<div class="modal-dialog">
+			  <div class="modal-content">
+		   
+				<!-- 模态框头部 -->
+				<div class="modal-header">
+				  <h4 class="modal-title">更多设置</h4>
+				  <button type="button" class="close" data-dismiss="modal">&times;</button>
+				</div>
+		   
+				<!-- 模态框主体 -->
+				<div class="modal-body" >
+				<div id='span_nightUpdata'>获取中...</div><button type='submit' class='btn btn-primary btn-sm' onclick='Put_nightUpdata()'>切换</button><hr/>
+				<div id='span_batDisplayType'>获取中...</div><button type='submit' class='btn btn-primary btn-sm' onclick='Put_batDisplayType()'>切换</button><hr/>
+				
+				<form action="/ScreenType" method="post">
+				<div class="form-group">
+				  <label for="sel1">屏幕类型：（未实现）</label>
+				  <select class="form-control" id="sel1" name='screenType'>
+					<option value="029A1">029A1</option>
+					<option value="029T5">029T5</option>
+					<option value="029T94">029T94</option>
+					<option value="029M06">029M06</option>
+				  </select>
+				  <button type='submit' class='btn btn-primary btn-sm' style='margin: 1% 0% 0% 0%'>保存</button>
+				</div>	  
+			  </form><hr/>
+				
+				<form id='form_inAWord' target='iframe_inAWord'>
+					<div class="form-group">
+					  <label for="comment">自定义一句话：</label>
+					  <textarea name='inAWord' class="form-control" rows="5" id="comment" maxlength='22' placeholder='只限22个字，发送空白为清除'></textarea>
+					</div>
+					<button type='submit' class='btn btn-primary btn-sm' onclick='tjxx_inAWord()'>发送</button>
+					<span id='span_inAWordReturnFormInfo'>
+					<!-- 按下保存按钮后服务器返回的消息提示 -->
+					</span>
+			    </form>
+				<iframe id='iframe_inAWord' name='iframe_inAWord' style='display:none;'></iframe>
+				</div>
+				
+				<!-- 模态框底部 -->
+				<div class="modal-footer">
+				  <button type="button" class="btn btn-danger" data-dismiss="modal">关闭</button>
+				</div>
+		   
+			  </div>
+			</div>
+		  </div>
+		  
+		  <!-- 系统信息模态框 -->
+		  <div class="modal fade" id="Modal_info">
+			<div class="modal-dialog">
+			  <div class="modal-content">
+		   
+				<!-- 模态框头部 -->
+				<div class="modal-header">
+				  <h4 class="modal-title">ESP32</h4>
+				  <button type="button" class="close" data-dismiss="modal">&times;</button>
+				</div>
+		   
+				<!-- 模态框主体 -->
+				<div class="modal-body">
+				  <span id='span_info'> 
+				  获取中...
+				  </span>
+				</div>
+				
+				<!-- 模态框底部 -->
+				<div class="modal-footer">
+				  <button type="button" class="btn btn-danger" data-dismiss="modal">关闭</button>
+				</div>
+		   
+			  </div>
+			</div>
+		  </div>
+		  
+		<br><br><br>
+		
+		<div class='row' style='text-align:center; font-size:0.8rem; background-color:#f6f9fa;'>
+			<div class='col'>天气服务由 <a href='https://www.seniverse.com/'>心知天气</a> 提供</div>
+		</div>
+		<div class='row' style='text-align:center; font-size:0.8rem; background-color:#f6f9fa;'>
+			<div class='col'>一言服务由 <a href='https://hitokoto.cn/'>hitokoto.cn</a> 提供</div>
+		</div>
+		<div class='row' style='text-align:center; font-size:0.8rem; background-color:#f6f9fa;'>
+			<div class='col'>By Onlyang</div>
+		</div>
+		
+	</div>
+	
+	<script>
+	
+	function tjxx_wifi() //WIFI表单提交
+	{
+		var form = document.getElementById('form_wifi');
+		// 将html表单转换为formData表单对象
+		var formData = new FormData(form);
+		// 创建ajax对象
+		var xhr = new XMLHttpRequest();
+		// 对ajax对象进行配置
+		xhr.open('POST', '/');
+		// 当发送跨域请求时，携带cookie信息
+		xhr.withCredentials = true;
+		// 发送请求并传递请求参数
+		xhr.send(formData);
+		// 监听服务器端给予的响应内容
+		xhr.onload = function()
+		{
+			console.log(xhr.responseText);
+			if(xhr.responseText != "") 
+			{
+				wifi_xiaoxi = xhr.responseText;
+				web_message = "<div class='alert alert-success alert-dismissible fade show' style='margin:10px;'>";
+				web_message += "<button type='button' class='close' data-dismiss='alert'>&times;</button>";
+				web_message += "<strong>" + wifi_xiaoxi + "</strong></div>";
+				document.getElementById('span_wifiReturnFormInfo').innerHTML = web_message;
+			}
+		}
+	}
+	
+	function tjxx_weather() //天气表单提交
+	{
+		var form = document.getElementById('form_weather');
+		// 将html表单转换为formData表单对象
+		var formData = new FormData(form );
+		// 创建ajax对象
+		var xhr = new XMLHttpRequest();
+		// 对ajax对象进行配置
+		xhr.open('POST', '/Weather');
+		// 当发送跨域请求时，携带cookie信息
+		xhr.withCredentials = true;
+		// 发送请求并传递请求参数
+		xhr.send(formData);
+		// 监听服务器端给予的响应内容
+		xhr.onload = function()
+		{
+			console.log(xhr.responseText);
+			if(xhr.responseText != "") 
+			{
+				wifi_xiaoxi = xhr.responseText;
+				web_message = "<div class='alert alert-success alert-dismissible fade show' style='margin:10px;'>";
+				web_message += "<button type='button' class='close' data-dismiss='alert'>&times;</button>";
+				web_message += "<strong>" + wifi_xiaoxi + "</strong></div>";
+				document.getElementById('span_weatherReturnFormInfo').innerHTML = web_message;
+			}
+		}
+	}
+	
+	function tjxx_inAWord() //自定义一句话表单提交
+	{
+		var form = document.getElementById('form_inAWord');
+		// 将html表单转换为formData表单对象
+		var formData = new FormData(form );
+		// 创建ajax对象
+		var xhr = new XMLHttpRequest();
+		// 对ajax对象进行配置
+		xhr.open('POST', '/InAWord');
+		// 当发送跨域请求时，携带cookie信息
+		xhr.withCredentials = true;
+		// 发送请求并传递请求参数
+		xhr.send(formData);
+		// 监听服务器端给予的响应内容
+		xhr.onload = function()
+		{
+			console.log(xhr.responseText);
+			if(xhr.responseText != "") 
+			{
+				wifi_xiaoxi = xhr.responseText;
+				web_message = "<div class='alert alert-success alert-dismissible fade show' style='margin:10px;'>";
+				web_message += "<button type='button' class='close' data-dismiss='alert'>&times;</button>";
+				web_message += "<strong>" + wifi_xiaoxi + "</strong></div>";
+				document.getElementById('span_inAWordReturnFormInfo').innerHTML = web_message;
+			}
+		}
+	}
+	
+	function get_updateAddress() //获取固件更新地址
+	{
+		var xhttp = new XMLHttpRequest();
+		xhttp.onreadystatechange = function()  //当前数据源的数据将要发生变化时
+		{	
+			if (xhttp.readyState == 4 && xhttp.status == 200)
+			{		
+				document.getElementById('span_updataAddress').innerHTML = xhttp.responseText;		
+			}			
+		};	
+		xhttp.open('GET', '/Read_updataAddress', true);
+		xhttp.send();
+	}
+	
+	function get_info()  //获取系统配置信息
+	{
+		var xhttp = new XMLHttpRequest();
+		xhttp.onreadystatechange = function()  //当前数据源的数据将要发生变化时
+		{	
+			if (xhttp.readyState == 4 && xhttp.status == 200)
+			{		
+				document.getElementById('span_info').innerHTML = xhttp.responseText;		
+			}			
+		};	
+		xhttp.open('GET', '/Read_info', true);
+		xhttp.send();
+	}
+	
+	function get_nightUpdata()  //获取夜间更新信息
+	{
+		var xhttp = new XMLHttpRequest();
+		xhttp.onreadystatechange = function()  //当前数据源的数据将要发生变化时
+		{	
+			if (xhttp.readyState == 4 && xhttp.status == 200)
+			{		
+				document.getElementById('span_nightUpdata').innerHTML = xhttp.responseText;		
+			}			
+		}
+		xhttp.open('GET', '/Read_nightUpdata', true);
+		xhttp.send();
+		get_batDisplayType();
+	}
+	function Put_nightUpdata()  //切换夜间更新
+	{
+		var xhttp = new XMLHttpRequest();
+		
+		xhttp.onreadystatechange = function()  //当前数据源的数据将要发生变化时
+		{	
+			if (xhttp.readyState == 4 && xhttp.status == 200)
+			{		
+				document.getElementById('span_nightUpdata').innerHTML = xhttp.responseText;		
+			}
+		}
+		xhttp.open('GET', '/Put_nightUpdata', true);
+		xhttp.send();
+	}
+	
+	function get_batDisplayType()  //获取电量显示类型
+	{
+		var xhttp = new XMLHttpRequest();
+		xhttp.onreadystatechange = function()  //当前数据源的数据将要发生变化时
+		{	
+			if (xhttp.readyState == 4 && xhttp.status == 200)
+			{		
+				document.getElementById('span_batDisplayType').innerHTML = xhttp.responseText;		
+			}			
+		}
+		xhttp.open('GET', '/Read_batDisplayType', true);
+		xhttp.send();
+	}
+	function Put_batDisplayType()  //切换电量显示类型
+	{
+		var xhttp = new XMLHttpRequest();
+		
+		xhttp.onreadystatechange = function()  //当前数据源的数据将要发生变化时
+		{	
+			if (xhttp.readyState == 4 && xhttp.status == 200)
+			{		
+				document.getElementById('span_batDisplayType').innerHTML = xhttp.responseText;		
+			}
+		}
+		xhttp.open('GET', '/Put_batDisplayType', true);
+		xhttp.send();
+	}
+	
+	
+	setInterval(function() {get_staNameIp();get_city();}, 1000); //1秒获取一次数据 
+	
+	function get_staNameIp()  //获取WIFI名称和IP地址
+	{
+		var xhttp = new XMLHttpRequest();
+		xhttp.onreadystatechange = function()  //当前数据源的数据将要发生变化时
+		{	
+			if (xhttp.readyState == 4 && xhttp.status == 200)
+			{		
+				document.getElementById('span_staNameIp').innerHTML = xhttp.responseText;		
+			}			
+		}
+		xhttp.open('GET', '/Read_staNameIp', true);
+		xhttp.send();
+	}
+	
+	function get_city()   //获取天气数据
+	{
+		var xhttp = new XMLHttpRequest();
+		xhttp.onreadystatechange = function()  //当前数据源的数据将要发生变化时
+		{
+			if (xhttp.readyState == 4 && xhttp.status == 200)
+			{
+				document.getElementById('span_city').innerHTML = xhttp.responseText;
+			}
+		}
+		xhttp.open('GET', '/Read_city', true);
+		xhttp.send();
+	}
+	</script>
+</body>
+</html>
